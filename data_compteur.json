@@ -1,6 +1,6 @@
 [
   {
-    "nom": "CHAMPION",
+    "nom": "CHAMPION Cédric",
     "adresse": "2 chemin du grippot 52310 VIEVILLE",
     "compteur": "CPT-0001",
     "commentaire": "Premier compteur de test",
@@ -8,5 +8,15 @@
     "releves": [],
     "lat": 48.236952, 
     "lng": 5.138396
+  },
+  {
+    "nom": "SERFASSE Estelle",
+    "adresse": "2 lotissemnt du moulin 52310 VIEVILLE",
+    "compteur": "CPT-0001",
+    "commentaire": "Premier compteur de test",
+    "photo_url": null,
+    "releves": [],
+    "lat": 48.240407, 
+    "lng": 5.132399
   }
 ]
