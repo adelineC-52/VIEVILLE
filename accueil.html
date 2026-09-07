@@ -58,7 +58,7 @@ input, textarea {
     <input id="compteur" placeholder="Numéro de compteur" />
     <input id="lng" placeholder="Longitude" />
     <input id="lat" placeholder="Lattitude" />
-    <textarea id="commentaire" placeholder="Commentaire"></textarea>
+    <textarea id="" placeholder=""></textarea>
     <input type="file" id="photo" accept="image/*" />
 
     <button onclick="ajouterAdresse()">Ajouter</button>
@@ -221,6 +221,8 @@ async function ajouterAdresse() {
     const nom = document.getElementById("nom").value.trim();
     const adresse = document.getElementById("adresse").value.trim();
     const compteur = document.getElementById("compteur").value.trim();
+    const lat = document.getElementById("lat").value.trim();
+    const lng = document.getElementById("lng").value.trim();
     const commentaire = document.getElementById("commentaire").value.trim();
     const photoFile = document.getElementById("photo").files[0];
 
@@ -240,8 +242,8 @@ async function ajouterAdresse() {
         compteur,
         commentaire,
         photo_url: photoURL,
-        lat: 48.2,
-        lng: 5.2,
+        lat,
+        lng,
         releves: []
     };
 
