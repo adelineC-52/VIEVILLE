@@ -2,14 +2,14 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Relevés Compteurs Eau - Commune</title>
+<title>Relevés Compteurs Eau - Viéville</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <!-- Leaflet -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-<!-- Google Identity -->
+<!-- Google Identity Services -->
 <script src="https://accounts.google.com/gsi/client" async></script>
 
 <style>
@@ -29,7 +29,7 @@ body {
 #map {
     flex: 1;
 }
-input, textarea, select {
+input, textarea {
     width: 100%;
     margin-bottom: 10px;
     padding: 6px;
@@ -66,36 +66,31 @@ input, textarea, select {
 
     <h3>Historique des relevés</h3>
     <div id="historique"></div>
-
 </div>
 
 <div id="map"></div>
 
 <script>
 // =========================
-// CONFIG GOOGLE SHEETS
+// CONFIG GOOGLE
 // =========================
+const API_KEY = "AIzaSyDs56GR0C7xZOJ5UDS9cHy3X0Dd5n5lzZs";
+const CLIENT_ID = "889221840439-i113qnd2rmokhl20s6g3rj1v2ti02sek.apps.googleusercontent.com";
 const SPREADSHEET_ID = "1oGKXSkD3GMGt2yXm1tDoPg8fEjC_yg0ttBqD1VFqGXo";
-const SHEET_RANGE = "adresses!A:H"; // nom | adresse | compteur | commentaire | photo_url | lat | lng | releves_json
+const RANGE = "adresses!A:H";
 
-// =========================
-// VARIABLES GLOBALES
-// =========================
-let data = [];          // tableau d’objets {nom, adresse, compteur, ... , rowIndex}
-let map;
-let markers = {};
 let googleAccessToken = null;
 
 // =========================
-// AUTHENTIFICATION GOOGLE
+// AUTH GOOGLE
 // =========================
 function ensureGoogleLogin() {
     return new Promise(resolve => {
         if (googleAccessToken) return resolve(googleAccessToken);
 
         google.accounts.oauth2.initTokenClient({
-            client_id: "YOUR_GOOGLE_CLIENT_ID",
-            scope: "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets",
+            client_id: CLIENT_ID,
+            scope: "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file",
             callback: (response) => {
                 googleAccessToken = response.access_token;
                 resolve(googleAccessToken);
@@ -111,9 +106,7 @@ async function sheetsGet(range) {
     const token = await ensureGoogleLogin();
     const res = await fetch(
         `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(range)}`,
-        {
-            headers: { Authorization: "Bearer " + token }
-        }
+        { headers: { Authorization: "Bearer " + token } }
     );
     return res.json();
 }
@@ -151,34 +144,37 @@ async function sheetsUpdate(range, values) {
 }
 
 // =========================
+// VARIABLES
+// =========================
+let data = [];
+let map;
+let markers = {};
+
+// =========================
 // CHARGEMENT DES DONNÉES
 // =========================
 async function chargerJSON() {
-    const json = await sheetsGet(SHEET_RANGE);
+    const json = await sheetsGet(RANGE);
     const rows = json.values || [];
 
-    // ligne 1 = en-têtes, les données commencent à la ligne 2
-    data = rows.map((r, i) => ({
+    data = rows.slice(1).map((r, i) => ({
         nom: r[0] || "",
         adresse: r[1] || "",
         compteur: r[2] || "",
         commentaire: r[3] || "",
         photo_url: r[4] || "",
-        lat: r[5] ? parseFloat(r[5]) : 48.2,
-        lng: r[6] ? parseFloat(r[6]) : 5.2,
+        lat: parseFloat(r[5]) || 48.2,
+        lng: parseFloat(r[6]) || 5.2,
         releves: r[7] ? JSON.parse(r[7]) : [],
-        rowIndex: i + 1 // index réel dans la sheet (1-based)
-    })).filter(o => o.rowIndex > 1); // on enlève la ligne d’en-tête
-
-    // réajuste rowIndex pour les données (ligne 2 = index 0)
-    data.forEach((o, idx) => { o.rowIndex = idx + 2; });
+        rowIndex: i + 2
+    }));
 
     initMap();
     afficherListe();
 }
 
 // =========================
-// INITIALISATION CARTE
+// CARTE
 // =========================
 function initMap() {
     map = L.map('map').setView([48.2, 5.2], 12);
@@ -190,8 +186,14 @@ function initMap() {
     data.forEach(addr => ajouterMarker(addr));
 }
 
+function ajouterMarker(addr) {
+    const marker = L.marker([addr.lat, addr.lng]).addTo(map);
+    marker.bindPopup(`<strong>${addr.nom}</strong><br>${addr.adresse}`);
+    markers[addr.compteur] = marker;
+}
+
 // =========================
-// AFFICHAGE LISTE
+// LISTE
 // =========================
 function afficherListe() {
     const div = document.getElementById("liste");
@@ -211,7 +213,7 @@ function afficherListe() {
 }
 
 // =========================
-// AJOUT D’UNE ADRESSE
+// AJOUT ADRESSE
 // =========================
 async function ajouterAdresse() {
     const nom = document.getElementById("nom").value.trim();
@@ -225,7 +227,7 @@ async function ajouterAdresse() {
         return;
     }
 
-    let photoURL = null;
+    let photoURL = "";
     if (photoFile) {
         photoURL = await uploadPhotoToDrive(photoFile);
     }
@@ -235,14 +237,13 @@ async function ajouterAdresse() {
         adresse,
         compteur,
         commentaire,
-        photo_url: photoURL || "",
+        photo_url: photoURL,
         lat: 48.2,
         lng: 5.2,
         releves: []
     };
 
-    // append dans la sheet
-    await sheetsAppend(SHEET_RANGE, [[
+    await sheetsAppend(RANGE, [[
         newEntry.nom,
         newEntry.adresse,
         newEntry.compteur,
@@ -253,28 +254,19 @@ async function ajouterAdresse() {
         JSON.stringify(newEntry.releves)
     ]]);
 
-    // calcule la nouvelle rowIndex (données existantes + 2 pour l’en-tête)
     newEntry.rowIndex = data.length + 2;
-
     data.push(newEntry);
+
     ajouterMarker(newEntry);
     afficherListe();
-
-    // reset formulaire
-    document.getElementById("nom").value = "";
-    document.getElementById("adresse").value = "";
-    document.getElementById("compteur").value = "";
-    document.getElementById("commentaire").value = "";
-    document.getElementById("photo").value = "";
 }
 
 // =========================
-// AFFICHAGE HISTORIQUE
+// HISTORIQUE
 // =========================
 function afficherHistorique(index) {
     const div = document.getElementById("historique");
     const addr = data[index];
-    const marker_a_afficher = markers[addr.compteur];
 
     div.innerHTML = `
         <h4>${addr.nom}</h4>
@@ -291,9 +283,10 @@ function afficherHistorique(index) {
         <button onclick="ajouterReleve(${index})">Ajouter relevé</button>
     `;
 
-    if (marker_a_afficher) {
-        marker_a_afficher.openPopup();
-        map.setView(marker_a_afficher.getLatLng(), 18);
+    const marker = markers[addr.compteur];
+    if (marker) {
+        marker.openPopup();
+        map.setView(marker.getLatLng(), 18);
     }
 }
 
@@ -305,31 +298,20 @@ async function ajouterReleve(index) {
     const date = document.getElementById("relDate").value;
 
     if (!val || !date) {
-        alert("Valeur et date sont obligatoires.");
+        alert("Valeur et date obligatoires.");
         return;
     }
 
     data[index].releves.push({ valeur: val, date });
 
-    const rowIndex = data[index].rowIndex;
-    const range = `adresses!H${rowIndex}`;
-
+    const range = `adresses!H${data[index].rowIndex}`;
     await sheetsUpdate(range, [[JSON.stringify(data[index].releves)]]);
 
     afficherHistorique(index);
 }
 
 // =========================
-// MARKERS
-// =========================
-function ajouterMarker(addr) {
-    const marker = L.marker([addr.lat, addr.lng]).addTo(map);
-    marker.bindPopup(`<strong>${addr.nom}</strong><br>${addr.adresse}`);
-    markers[addr.compteur] = marker;
-}
-
-// =========================
-// GOOGLE DRIVE UPLOAD
+// UPLOAD PHOTO DRIVE
 // =========================
 async function uploadPhotoToDrive(file) {
     const token = await ensureGoogleLogin();
@@ -357,10 +339,7 @@ async function uploadPhotoToDrive(file) {
             Authorization: "Bearer " + token,
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-            role: "reader",
-            type: "anyone"
-        })
+        body: JSON.stringify({ role: "reader", type: "anyone" })
     });
 
     return `https://drive.google.com/uc?id=${fileData.id}`;
