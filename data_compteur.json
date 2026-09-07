@@ -1,0 +1,12 @@
+[
+  {
+    "nom": "CHAMPION",
+    "adresse": "2 chemin du grippot 52310 VIEVILLE",
+    "compteur": "CPT-0001",
+    "commentaire": "Premier compteur de test",
+    "photo_url": null,
+    "releves": [],
+    "lat": 48.2000,
+    "lng": 5.2000
+  }
+]
