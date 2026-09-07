@@ -232,7 +232,7 @@ function initMap() {
 
 function ajouterMarker(addr) {
     const marker = L.marker([addr.lat, addr.lng]).addTo(map);
-    marker.bindPopup(`<strong>${addr.nom}</strong><br>${addr.adresse}`);
+    marker.bindPopup(`<strong>${addr.nom}</strong><br>${addr.adresse}<br>Compteur ${addr.compteur}`);
     markers[addr.compteur] = marker;
 }
 
