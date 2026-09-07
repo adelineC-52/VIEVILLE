@@ -5,9 +5,10 @@
     "compteur": "CPT-0001",
     "commentaire": "Premier compteur de test",
     "photo_url": null,
-    "releves": [],
+    "dernier_releve": 125,
     "lat": 48.236952, 
-    "lng": 5.138396
+    "lng": 5.138396,
+    "releves" : []
   },
   {
     "nom": "SERFASSE Estelle",
@@ -15,8 +16,9 @@
     "compteur": "CPT-0001",
     "commentaire": "Premier compteur de test",
     "photo_url": null,
-    "releves": [],
+    "dernier_releve": 110,
     "lat": 48.240407, 
-    "lng": 5.132399
+    "lng": 5.132399,
+    "releves" : []
   }
 ]
