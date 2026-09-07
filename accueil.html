@@ -232,7 +232,15 @@ function initMap() {
 
 function ajouterMarker(addr) {
     const marker = L.marker([addr.lat, addr.lng]).addTo(map);
-    marker.bindPopup(`<strong>${addr.nom}</strong><br>${addr.adresse}<br>Compteur ${addr.compteur}`);
+    // Dernier relevé
+    const last = addr.releves && addr.releves.length > 0
+        ? addr.releves[addr.releves.length - 1]
+        : null;
+    marker.bindPopup(`<strong>${addr.nom}</strong><br>${addr.adresse}<br>Compteur ${addr.compteur}<br>
+        ${ last 
+            ? `<br><strong>Dernier relevé :</strong><br>${last.date} → ${last.valeur}`
+            : `<br><em>Aucun relevé enregistré</em>`
+        }`);
     markers[addr.compteur] = marker;
 }
 
