@@ -268,20 +268,7 @@ function ajouterMarker(addr) {
 // LISTE
 // =========================
 function afficherListe() {
-    const div = document.getElementById("liste");
-    div.innerHTML = "";
-
-    data.forEach((addr, index) => {
-        const item = document.createElement("div");
-        item.className = "address-item";
-        item.innerHTML = `
-            <strong>${addr.nom}</strong><br>
-            ${addr.adresse}<br>
-            Compteur : ${addr.compteur}
-        `;
-        item.onclick = () => afficherHistorique(index);
-        div.appendChild(item);
-    });
+    afficherListeRegroupee(data);
 }
 
 // =========================
@@ -461,25 +448,67 @@ window.addEventListener("load", () => {
 }
 
 function afficherListeFiltrée(query, type) {
-    const div = document.getElementById("liste");
-    div.innerHTML = "";
-
     const filtered = data.filter(addr =>
         addr[type].toLowerCase().includes(query.toLowerCase())
     );
 
-    filtered.forEach((addr, index) => {
-        const item = document.createElement("div");
-        item.className = "address-item";
-        item.innerHTML = `
-            <strong>${addr.nom}</strong><br>
-            ${addr.adresse}<br>
-            Compteur : ${addr.compteur}
-        `;
-        item.onclick = () => afficherHistorique(index);
-        div.appendChild(item);
+    afficherListeRegroupee(filtered);
+}
+
+function afficherListeRegroupee(resultats) {
+    const div = document.getElementById("liste");
+    div.innerHTML = "";
+
+    // Regroupement par adresse
+    const groupes = {};
+    resultats.forEach(addr => {
+        if (!groupes[addr.adresse]) groupes[addr.adresse] = [];
+        groupes[addr.adresse].push(addr);
+    });
+
+    // Construction de l'accordéon
+    Object.keys(groupes).forEach(adresse => {
+        const section = document.createElement("div");
+        section.style.marginBottom = "10px";
+
+        // En-tête repliable
+        const header = document.createElement("div");
+        header.style.padding = "8px";
+        header.style.background = "#ddd";
+        header.style.cursor = "pointer";
+        header.style.fontWeight = "bold";
+        header.innerText = adresse;
+
+        // Contenu replié
+        const content = document.createElement("div");
+        content.style.display = "none";
+        content.style.padding = "8px";
+        content.style.border = "1px solid #ccc";
+        content.style.background = "#fafafa";
+
+        // Ajout des personnes / compteurs
+        groupes[adresse].forEach(addr => {
+            const item = document.createElement("div");
+            item.className = "address-item";
+            item.innerHTML = `
+                <strong>${addr.nom}</strong><br>
+                Compteur : ${addr.compteur}
+            `;
+            item.onclick = () => afficherHistorique(data.indexOf(addr));
+            content.appendChild(item);
+        });
+
+        // Toggle
+        header.onclick = () => {
+            content.style.display = content.style.display === "none" ? "block" : "none";
+        };
+
+        section.appendChild(header);
+        section.appendChild(content);
+        div.appendChild(section);
     });
 }
+
 
 </script>
 
