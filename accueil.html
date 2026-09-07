@@ -67,6 +67,16 @@ input, textarea {
 .address-item:hover {
     background: #e9f3ff;
 }
+
+#suggestions div:hover {
+    background:#e9f3ff;
+}
+
+#sidebar {
+    position: relative;
+}
+
+
 </style>
 </head>
 
@@ -77,7 +87,17 @@ input, textarea {
 
     <button onclick="ouvrirModal()">➕ Ajouter une adresse</button>
 
-    <h3>Liste des adresses</h3>
+   <h3>Liste des adresses</h3>
+
+    <select id="filtreType">
+        <option value="nom">Nom</option>
+        <option value="adresse">Adresse</option>
+    </select>
+    
+    <input id="filtreInput" placeholder="Rechercher..." oninput="filtrerListe()" />
+    
+    <div id="suggestions" style="background:#fff;border:1px solid #ccc;display:none;position:absolute;z-index:9999;"></div>
+    
     <div id="liste"></div>
 
     <h3>Historique des relevés</h3>
@@ -406,6 +426,61 @@ async function uploadPhotoToDrive(file) {
 window.addEventListener("load", () => {
     chargerJSON();
 });
+
+    function filtrerListe() {
+    const type = document.getElementById("filtreType").value;
+    const query = document.getElementById("filtreInput").value.toLowerCase();
+    const div = document.getElementById("liste");
+
+    // Suggestions
+    const suggestionsDiv = document.getElementById("suggestions");
+    suggestionsDiv.innerHTML = "";
+    suggestionsDiv.style.display = query.length > 0 ? "block" : "none";
+
+    // Filtrage
+    const filtered = data.filter(addr =>
+        addr[type].toLowerCase().includes(query)
+    );
+
+    // Auto-complétion
+    filtered.slice(0, 10).forEach(addr => {
+        const s = document.createElement("div");
+        s.style.padding = "5px";
+        s.style.cursor = "pointer";
+        s.innerText = addr[type];
+        s.onclick = () => {
+            document.getElementById("filtreInput").value = addr[type];
+            suggestionsDiv.style.display = "none";
+            afficherListeFiltrée(addr[type], type);
+        };
+        suggestionsDiv.appendChild(s);
+    });
+
+    // Affichage liste filtrée
+    afficherListeFiltrée(query, type);
+}
+
+function afficherListeFiltrée(query, type) {
+    const div = document.getElementById("liste");
+    div.innerHTML = "";
+
+    const filtered = data.filter(addr =>
+        addr[type].toLowerCase().includes(query.toLowerCase())
+    );
+
+    filtered.forEach((addr, index) => {
+        const item = document.createElement("div");
+        item.className = "address-item";
+        item.innerHTML = `
+            <strong>${addr.nom}</strong><br>
+            ${addr.adresse}<br>
+            Compteur : ${addr.compteur}
+        `;
+        item.onclick = () => afficherHistorique(index);
+        div.appendChild(item);
+    });
+}
+
 </script>
 
 </body>
