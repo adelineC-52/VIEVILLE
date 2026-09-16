@@ -308,7 +308,9 @@ async function chargerJSON() {
         );
     }
 
-    data = rows.slice(1).map((r, i) => ({
+    data = rows.slice(1).map((r, i) => (
+        console.log("Row:", r, "lat:", r[8], "lng:", r[9]);
+        return {
         nom: r[0] || "",
         prenom: r[1] || "",
         numero: r[2] || "",
@@ -323,6 +325,8 @@ async function chargerJSON() {
         releves: r[11] ? JSON.parse(r[11]) : [],
         rowIndex: i + 2
     }));
+
+    
 
     initMap();
     afficherListe();
