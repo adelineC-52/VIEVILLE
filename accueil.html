@@ -186,6 +186,8 @@ button:hover {
         <h3>Ajouter une adresse</h3>
 
         <input id="nom" placeholder="Nom" />
+        <input id="prenom" placeholder="Prénom" />
+        <input id="numero" placeholder="Numéro" />
         <input id="adresse" placeholder="Adresse" />
         <input id="compteur" placeholder="Numéro de compteur" />
         <input id="lng" placeholder="Longitude" />
@@ -297,13 +299,17 @@ async function chargerJSON() {
 
     data = rows.slice(1).map((r, i) => ({
         nom: r[0] || "",
-        adresse: r[1] || "",
-        compteur: r[2] || "",
-        commentaire: r[3] || "",
-        photo_url: r[4] || "",
-        lat: parseFloat(r[5]) || 48.2,
-        lng: parseFloat(r[6]) || 5.2,
-        releves: r[7] ? JSON.parse(r[7]) : [],
+        prenom: r[1] || "",
+        numero: r[2] || "",
+        suffixe: r[3] || "",
+        adresse: r[4] || "",
+        compteur: r[5] || "",
+        commentaire: r[6] || "",
+        photo_url: r[7] || "",
+        lat: parseFloat(r[8]) || 48.2,
+        lng: parseFloat(r[9]) || 5.2,
+        dernier_releve: r[10] || "",
+        releves: r[11] ? JSON.parse(r[11]) : [],
         rowIndex: i + 2
     }));
 
@@ -330,9 +336,9 @@ function ajouterMarker(addr) {
     const last = addr.releves && addr.releves.length > 0
         ? addr.releves[addr.releves.length - 1]
         : null;
-    marker.bindPopup(`<strong>${addr.nom}</strong><br>${addr.adresse}<br>Compteur ${addr.compteur}<br>
+    marker.bindPopup(`<strong>${addr.nom} ${addr.prenom}</strong><br>${addr.numero} ${addr.adresse}<br>Compteur ${addr.compteur}<br>
         ${ last 
-            ? `<br><strong>Dernier relevé :</strong><br>${last.date} → ${last.valeur}`
+            ? `<br><strong>Dernier relevé :</strong><br>${addr.dernier_releve}`
             : `<br><em>Aucun relevé enregistré</em>`
         }`);
     markers[addr.compteur] = marker;
@@ -350,6 +356,8 @@ function afficherListe() {
 // =========================
 async function ajouterAdresse() {
     const nom = document.getElementById("nom").value.trim();
+    const prenom = document.getElementById("prenom").value.trim();
+    const numero = document.getElementById("numero").value.trim();
     const adresse = document.getElementById("adresse").value.trim();
     const compteur = document.getElementById("compteur").value.trim();
     const lat = document.getElementById("lat").value.trim();
@@ -357,8 +365,8 @@ async function ajouterAdresse() {
     const commentaire = document.getElementById("commentaire").value.trim();
     const photoFile = document.getElementById("photo").files[0];
 
-    if (!nom || !adresse || !compteur) {
-        alert("Nom, adresse et compteur sont obligatoires.");
+    if (!nom || !prenom || !adresse || !compteur) {
+        alert("Nom, Prénom, adresse et compteur sont obligatoires.");
         return;
     }
 
@@ -369,23 +377,31 @@ async function ajouterAdresse() {
 
     const newEntry = {
         nom,
+        prenom,
+        numero,
+        suffixe,
         adresse,
         compteur,
         commentaire,
         photo_url: photoURL,
         lat,
         lng,
+        dernier_releve,
         releves: []
     };
 
     await sheetsAppend(RANGE, [[
         newEntry.nom,
+        newEntry.prenom,
+        newEntry.numero,
+        newEntry.suffixe,
         newEntry.adresse,
         newEntry.compteur,
         newEntry.commentaire,
         newEntry.photo_url,
         newEntry.lat,
         newEntry.lng,
+        newEntry.dernier_releve
         JSON.stringify(newEntry.releves)
     ]]);
 
@@ -405,8 +421,8 @@ function afficherHistorique(index) {
     const addr = data[index];
 
     div.innerHTML = `
-        <h4>${addr.nom}</h4>
-        <p>${addr.adresse}</p>
+        <h4>${addr.nom} ${addr.prenom}</h4>
+        <p>${addr.numero} ${addr.adresse}</p>
         <p>Compteur : ${addr.compteur}</p>
         <p>${addr.commentaire}</p>
         ${addr.photo_url ? `<img src="${addr.photo_url}" width="200">` : ""}
