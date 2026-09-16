@@ -308,9 +308,27 @@ async function chargerJSON() {
         );
     }
 
+    data = rows.slice(1).map((r, i) => {
+    console.log("Row", i+2, r);
+    return {
+        nom: r[0] || "",
+        prenom: r[1] || "",
+        numero: r[2] || "",
+        suffixe: r[3] || "",
+        adresse: r[4] || "",
+        compteur: r[5] || "",
+        commentaire: r[6] || "",
+        photo_url: r[7] || "",
+        lat: toFloat(r[8]) || 48.2,
+        lng: toFloat(r[9]) || 5.2,
+        dernier_releve: r[10] || "",
+        releves: r[11] ? JSON.parse(r[11]) : [],
+        rowIndex: i + 2
+    };
+});
+    
     data = rows.slice(1).map((r, i) => (
-        console.log("Row:", r, "lat:", r[8], "lng:", r[9]);
-        return {
+        {
         nom: r[0] || "",
         prenom: r[1] || "",
         numero: r[2] || "",
