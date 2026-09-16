@@ -297,6 +297,17 @@ async function chargerJSON() {
     const json = await sheetsGet(RANGE);
     const rows = json.values || [];
 
+
+    function toFloat(v) {
+    if (!v) return null;
+        return parseFloat(
+            String(v)
+                .replace(",", ".")      // virgule → point
+                .replace(/\s/g, "")     // supprime espaces normaux
+                .replace(/\u00A0/g, "") // supprime espaces insécables
+        );
+    }
+
     data = rows.slice(1).map((r, i) => ({
         nom: r[0] || "",
         prenom: r[1] || "",
@@ -306,8 +317,8 @@ async function chargerJSON() {
         compteur: r[5] || "",
         commentaire: r[6] || "",
         photo_url: r[7] || "",
-        lat: parseFloat(r[8]) || 48.2,
-        lng: parseFloat(r[9]) || 5.2,
+        lat: toFloat(r[8]) || 48.2,
+        lng: toFloat(r[9]) || 5.2,
         dernier_releve: r[10] || "",
         releves: r[11] ? JSON.parse(r[11]) : [],
         rowIndex: i + 2
