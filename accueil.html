@@ -346,16 +346,31 @@ function initMap() {
 }
 
 function ajouterMarker(addr) {
+
     const marker = L.marker([addr.lat, addr.lng]).addTo(map);
+
     // Dernier relevé
     const last = addr.releves && addr.releves.length > 0
         ? addr.releves[addr.releves.length - 1]
         : null;
-    marker.bindPopup(`<strong>${addr.nom} ${addr.prenom}</strong><br>${addr.numero} ${addr.adresse}<br>Compteur ${addr.compteur}<br>
+
+    // Popup avec bouton
+    const popupContent = `
+        <strong>${addr.nom} ${addr.prenom}</strong><br>
+        ${addr.numero} ${addr.adresse}<br>
+        Compteur : ${addr.compteur}<br>
         ${ last 
             ? `<br><strong>Dernier relevé :</strong><br>${addr.dernier_releve}`
             : `<br><em>Aucun relevé enregistré</em>`
-        }`);
+        }
+        <br><br>
+        <button onclick="ajouterReleve(${addr.index})">
+            Ajouter relevé
+        </button>
+    `;
+
+    marker.bindPopup(popupContent);
+
     markers[addr.compteur] = marker;
 }
 
