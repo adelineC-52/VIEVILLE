@@ -364,7 +364,7 @@ function ajouterMarker(addr) {
             : `<br><em>Aucun relevé enregistré</em>`
         }
         <br><br>
-        <button onclick="ajouterReleve(${addr.index})">
+        <button onclick="ajouterReleveDepuisMarker(${addr.index})">
             Ajouter relevé
         </button>
     `;
@@ -472,10 +472,28 @@ function afficherHistorique(index) {
     }
 }
 
+function ajouterReleveDepuisMarker(index) {
+
+    // Ouvre ta popup HTML
+    document.getElementById("historique").style.display = "block";
+
+    // Pré-remplit la date du jour
+    const today = new Date().toISOString().split("T")[0];
+    document.getElementById("relDate").value = today;
+
+    // Stocke l’index du compteur sélectionné
+    window.indexCourant = index;
+
+    // Scroll vers la zone
+    document.getElementById("historique").scrollIntoView({ behavior: "smooth" });
+}
+    
 // =========================
 // AJOUT RELEVÉ
 // =========================
 async function ajouterReleve(index) {
+     const index = window.indexCourant;
+    
     const val = document.getElementById("relValeur").value.trim();
     const date = document.getElementById("relDate").value;
 
