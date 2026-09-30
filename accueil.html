@@ -448,6 +448,9 @@ async function ajouterAdresse() {
         photoURL = await uploadPhotoToDrive(photoFile);
     }
 
+    // index = position dans data après insertion
+    const index = data.length;          // 0, 1, 2, ...
+    
     const newEntry = {
         nom,
         prenom,
@@ -460,6 +463,7 @@ async function ajouterAdresse() {
         lat,
         lng,
         dernier_releve,
+        index,    
         releves: []
     };
 
