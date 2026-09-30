@@ -407,7 +407,7 @@ function ajouterMarker(addr) {
             : `<br><em>Aucun relevé enregistré</em>`
         }
         <br><br>
-        <button onclick="ajouterReleveDepuisMarker(${addr.index})">
+        <button onclick="veDepuisMarker(${addr.index})">
             Ajouter relevé
         </button>
     `;
@@ -505,7 +505,7 @@ function afficherHistorique(index) {
         </ul>
         <input id="relValeur" placeholder="Valeur relevé">
         <input id="relDate" type="date">
-        <button onclick="ajouterReleve(${index})">Ajouter relevé</button>
+        <button onclick="ve(${index})">Ajouter relevé</button>
     `;
 
     const marker = markers[addr.compteur];
@@ -516,19 +516,57 @@ function afficherHistorique(index) {
 }
 
 function ajouterReleveDepuisMarker(index) {
+    const addr = data[index];
 
-    // Ouvre ta popup HTML
-    document.getElementById("historique").style.display = "block";
+    // Contenu HTML du popup de saisie
+    const popupForm = `
+        <div style="min-width:200px">
+            <h4>Ajouter un relevé</h4>
 
-    // Pré-remplit la date du jour
-    const today = new Date().toISOString().split("T")[0];
-    document.getElementById("relDate").value = today;
+            <strong>${addr.nom} ${addr.prenom}</strong><br>
+            Compteur : ${addr.compteur}<br><br>
 
-    // Stocke l’index du compteur sélectionné
-    window.indexCourant = index;
+            <label>Dernier relevé :</label><br>
+            <input id="popup-dernier" type="number" value="${addr.dernier_releve || ''}" style="width:100%"><br><br>
 
-    // Scroll vers la zone
-    document.getElementById("historique").scrollIntoView({ behavior: "smooth" });
+            <label>Nouveau relevé :</label><br>
+            <input id="popup-nouveau" type="number" style="width:100%"><br><br>
+
+            <button onclick="validerRelevePopup(${index})">
+                Enregistrer
+            </button>
+        </div>
+    `;
+
+    // Ouvrir la popup sur le marker
+    markers[addr.compteur]
+        .bindPopup(popupForm)
+        .openPopup();
+}
+
+
+    function validerRelevePopup(index) {
+    const addr = data[index];
+
+    const nouveau = parseFloat(document.getElementById("popup-nouveau").value);
+    const dernier = parseFloat(document.getElementById("popup-dernier").value);
+
+    if (isNaN(nouveau)) {
+        alert("Veuillez saisir un relevé valide.");
+        return;
+    }
+
+    // Mise à jour des données
+    addr.releves.push(nouveau);
+    addr.dernier_releve = nouveau;
+
+    // Sauvegarde dans Google Sheets
+    sauvegarderReleve(addr);
+
+    alert("Relevé enregistré !");
+    
+    // Fermer la popup
+    markers[addr.compteur].closePopup();
 }
     
 // =========================
