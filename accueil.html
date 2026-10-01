@@ -586,7 +586,7 @@ const dateFormatee = aujourdHui.toLocaleDateString('fr-FR'); // "01/10/2026"
    
     data[addr.rowIndex].releves.push({ valeur: addr.dernier_releve, date: dateFormatee });
 
-    const range = `adresses!F${data[addr.rowIndex].compteur}`;
+    const range = `adresses!L${data[addr.rowIndex].rowIndex}`;
     await sheetsUpdate(range, [[JSON.stringify(data[addr.rowIndex].releves)]]);
 
    
