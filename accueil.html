@@ -586,10 +586,10 @@ const dateFormatee = aujourdHui.toLocaleDateString('fr-FR'); // "01/10/2026"
    
     data[addr.rowIndex].releves.push({ valeur: addr.dernier_releve, date: dateFormatee });
 
-    const range = `adresses!F${data[index].compteur}`;
-    await sheetsUpdate(range, [[JSON.stringify(data[index].releves)]]);
+    const range = `adresses!F${data[addr.rowIndex].compteur}`;
+    await sheetsUpdate(range, [[JSON.stringify(data[addr.rowIndex].releves)]]);
 
-    afficherHistorique(index);
+   
 }
     
 // =========================
