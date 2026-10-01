@@ -566,7 +566,9 @@ function ajouterReleveDepuisMarker(index) {
     addr.dernier_releve = nouveau;
 
     // Sauvegarde dans Google Sheets
-    sauvegarderReleve(addr);
+    //sauvegarderReleve(addr);
+    const range = `adresses!H${data[index].rowIndex}`;
+    await sheetsUpdate(range, [[JSON.stringify(data[index].releves)]]);
 
     alert("Relevé enregistré !");
     
