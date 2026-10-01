@@ -579,7 +579,7 @@ async function sauvegarderReleve(addr) {
      //const index = window.indexCourant;
     
    
-    data[index].releves.push({ valeur: addr.dernier_releve, "01/10/2026" });
+    data[index].releves.push({ valeur: addr.dernier_releve, date() });
 
     const range = `adresses!H${data[index].rowIndex}`;
     await sheetsUpdate(range, [[JSON.stringify(data[index].releves)]]);
