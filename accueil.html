@@ -407,7 +407,7 @@ function ajouterMarker(addr) {
             : `<br><em>Aucun relevé enregistré</em>`
         }
         <br><br>
-        <button onclick="ajouterReleveDepuisMarker(${addr.index})">
+        <button onclick="ajouterReleveDepuisMarker(${addr.compteur})">
             Ajouter relevé
         </button>
     `;
@@ -463,8 +463,8 @@ async function ajouterAdresse() {
         lat,
         lng,
         dernier_releve,
-        index,    
-        releves: []
+        releves: [],
+        index
     };
 
     await sheetsAppend(RANGE, [[
@@ -479,7 +479,8 @@ async function ajouterAdresse() {
         newEntry.lat,
         newEntry.lng,
         newEntry.dernier_releve,
-        JSON.stringify(newEntry.releves)
+        JSON.stringify(newEntry.releves),
+        index
     ]]);
 
     newEntry.rowIndex = data.length + 2;
