@@ -566,14 +566,25 @@ function ajouterReleveDepuisMarker(index) {
     addr.dernier_releve = nouveau;
 
     // Sauvegarde dans Google Sheets
-    //sauvegarderReleve(addr);
-    const range = `adresses!H${data[index].rowIndex}`;
-    await sheetsUpdate(range, [[JSON.stringify(data[index].releves)]]);
+    sauvegarderReleve(addr);
+   
 
     alert("Relevé enregistré !");
     
     // Fermer la popup
     markers[addr.compteur].closePopup();
+}
+
+async function sauvegarderReleve(addr) {
+     //const index = window.indexCourant;
+    
+   
+    data[index].releves.push({ valeur: addr.dernier_releve, "01/10/2026" });
+
+    const range = `adresses!H${data[index].rowIndex}`;
+    await sheetsUpdate(range, [[JSON.stringify(data[index].releves)]]);
+
+    afficherHistorique(index);
 }
     
 // =========================
