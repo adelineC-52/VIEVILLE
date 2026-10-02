@@ -407,7 +407,7 @@ function ajouterMarker(addr) {
             : `<br><em>Aucun relevé enregistré</em>`
         }
         <br><br>
-        <button onclick="ajouterReleveDepuisMarker(addr.rowIndex)">
+        <button onclick="ajouterReleveDepuisMarker(${addr.rowIndex})">
             Ajouter relevé
         </button>
     `;
@@ -417,7 +417,7 @@ function ajouterMarker(addr) {
 
     markers[addr.compteur] = marker;
 
-    ajouterReleveDepuisMarker(${addr.rowIndex});
+    ajouterReleveDepuisMarker(addr.rowIndex);
 }
 
 // =========================
