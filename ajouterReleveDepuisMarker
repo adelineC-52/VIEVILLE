@@ -412,9 +412,12 @@ function ajouterMarker(addr) {
         </button>
     `;
 
+    
     marker.bindPopup(popupContent);
 
     markers[addr.compteur] = marker;
+
+    ajouterReleveDepuisMarker(${addr.rowIndex});
 }
 
 // =========================
