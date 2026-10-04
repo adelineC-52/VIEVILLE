@@ -588,10 +588,12 @@ const aujourdHui = new Date();
 const dateFormatee = aujourdHui.toLocaleDateString('fr-FR'); // "01/10/2026"
    
     data[addr.rowIndex].releves.push({ valeur: addr.dernier_releve, date: dateFormatee });
-  debugger;
+  
     const range = `adresses!L${data[addr.rowIndex].rowIndex + 2 }`;
     await sheetsUpdate(range, [[JSON.stringify(data[addr.rowIndex].releves)]]);
 
+    const rangeDernier = `adresses!M${data[addr.rowIndex].rowIndex + 2}`;
+    await sheetsUpdate(rangeDernier, [[addr.dernier_releve]]);
    
 }
     
