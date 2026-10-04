@@ -738,7 +738,7 @@ function afficherListeRegroupee(resultats) {
             const item = document.createElement("div");
             item.className = "address-item";
             item.innerHTML = `
-                <strong>${addr.nom}</strong><br>
+                <strong>${addr.nom} ${addr.prenom}</strong><br>
                 Compteur : ${addr.compteur}
             `;
             item.onclick = () => afficherHistorique(data.indexOf(addr));
